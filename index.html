@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Party of Allah</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Noto+Naskh+Arabic:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --emerald:      #1a4a3a;
+      --emerald-deep: #0d2b22;
+      --emerald-glow: #2d7a5f;
+      --emerald-soft: #3a8a6a;
+      --gold:         #c9a84c;
+      --gold-light:   #e8cc7a;
+      --gold-dim:     #7a5f28;
+      --deep:         #060e0a;
+      --surface:      #0f2018;
+      --text:         #d0dcd4;
+      --text-dim:     #6a8070;
+      --white:        #f0f4f0;
+    }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--deep); color: var(--text); font-family: 'EB Garamond', serif; overflow-x: hidden; cursor: none; }
+    .cursor      { position: fixed; width: 7px; height: 7px; background: var(--gold); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); }
+    .cursor-ring { position: fixed; width: 30px; height: 30px; border: 1px solid rgba(201,168,76,0.4); border-radius: 50%; pointer-events: none; z-index: 9998; transform: translate(-50%,-50%); transition: width .3s, height .3s, border-color .3s; }
+    #bg { position: fixed; inset: 0; z-index: 0; opacity: 0.55; }
+    body::after  { content: ''; position: fixed; inset: 0; z-index: 1; background: radial-gradient(ellipse at center, transparent 35%, rgba(6,14,10,0.9) 100%); pointer-events: none; }
+    body::before { content: ''; position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: 0.35; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.1'/%3E%3C/svg%3E"); }
+    main { position: relative; z-index: 2; }
+
+    .hero { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 2rem; position: relative; }
+    .ring { position: absolute; border-radius: 50%; border: 1px solid rgba(201,168,76,0.1); top: 50%; left: 50%; transform: translate(-50%,-50%); }
+    .ring-1 { width: 560px; height: 560px; animation: spin 80s linear infinite; }
+    .ring-2 { width: 440px; height: 440px; animation: spin 55s linear infinite reverse; border-color: rgba(45,122,95,0.15); }
+    .ring-3 { width: 340px; height: 340px; animation: spin 100s linear infinite; border-color: rgba(201,168,76,0.06); }
+    @keyframes spin { to { transform: translate(-50%,-50%) rotate(360deg); } }
+
+    .star-wrap { margin-bottom: 2.5rem; opacity: 0; animation: fadeup 1.2s ease .2s forwards; }
+    .star-svg { width: 64px; height: 64px; }
+
+    .arabic { font-family: 'Noto Naskh Arabic', serif; font-size: clamp(2.8rem,7vw,5.5rem); color: var(--gold); line-height: 1.2; text-shadow: 0 0 80px rgba(201,168,76,0.3); opacity: 0; animation: fadeup 1.2s ease .4s forwards; }
+    .bar    { width: 100px; height: 1px; background: linear-gradient(90deg, transparent, var(--gold-dim), transparent); margin: 1.6rem auto; opacity: 0; animation: fadeup 1.2s ease .6s forwards; }
+    .latin  { font-family: 'Cinzel', serif; font-size: clamp(1.6rem,4vw,3.2rem); font-weight: 600; letter-spacing: 0.3em; color: var(--white); text-transform: uppercase; opacity: 0; animation: fadeup 1.2s ease .75s forwards; }
+    .sub    { font-style: italic; font-size: clamp(1rem,2vw,1.25rem); color: var(--text-dim); letter-spacing: 0.12em; margin-top: 1.2rem; opacity: 0; animation: fadeup 1.2s ease 1s forwards; }
+
+    .scroll-cue { position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: .5rem; opacity: 0; animation: fadeup 1s ease 2s forwards; color: var(--text-dim); font-size: .65rem; letter-spacing: .25em; text-transform: uppercase; }
+    .scroll-cue span { width: 1px; height: 48px; background: linear-gradient(to bottom, var(--gold-dim), transparent); animation: pulse 2s ease-in-out infinite; }
+    @keyframes pulse { 0%,100%{opacity:.3} 50%{opacity:1} }
+    @keyframes fadeup { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+
+    .marquee-wrap  { overflow: hidden; border-top: 1px solid rgba(201,168,76,0.1); border-bottom: 1px solid rgba(201,168,76,0.1); padding: 1.1rem 0; background: rgba(45,122,95,0.04); }
+    .marquee-track { display: flex; width: max-content; animation: march 35s linear infinite; gap: 3rem; align-items: center; }
+    .marquee-track span { font-family: 'Cinzel', serif; font-size: .65rem; letter-spacing: .35em; color: var(--text-dim); text-transform: uppercase; white-space: nowrap; }
+    .marquee-track .gem { color: var(--gold); font-size: .9rem; }
+    @keyframes march { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+    section { padding: clamp(5rem,10vh,9rem) clamp(1.5rem,8vw,10rem); position: relative; }
+    .sec-label { font-family: 'Cinzel', serif; font-size: .6rem; letter-spacing: .4em; color: var(--gold-dim); text-transform: uppercase; margin-bottom: 3rem; display: flex; align-items: center; gap: 1rem; }
+    .sec-label::after { content: ''; flex: 1; max-width: 70px; height: 1px; background: var(--gold-dim); opacity: .35; }
+
+    .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
+    @media (max-width: 680px) { .about-grid { grid-template-columns: 1fr; gap: 2rem; } .ring-1{width:300px;height:300px} .ring-2{width:240px;height:240px} .ring-3{width:190px;height:190px} }
+    .about-quote { font-size: clamp(1.5rem,2.8vw,2.2rem); font-weight: 400; line-height: 1.65; color: var(--text); border-left: 2px solid var(--emerald-soft); padding-left: 2rem; }
+    .about-quote em { color: var(--gold); font-style: italic; }
+    .about-body { font-size: 1.05rem; line-height: 1.9; color: var(--text-dim); }
+    .about-body p+p { margin-top: 1.2rem; }
+
+    .pillars { display: grid; grid-template-columns: repeat(auto-fit,minmax(240px,1fr)); gap: 1.5rem; margin-top: 1rem; }
+    .pillar { background: rgba(255,255,255,0.015); border: 1px solid rgba(201,168,76,0.09); padding: 2rem 1.8rem; position: relative; overflow: hidden; transition: border-color .4s, transform .4s; cursor: default; }
+    .pillar::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at top left, rgba(45,122,95,0.08), transparent 65%); opacity: 0; transition: opacity .4s; }
+    .pillar:hover { border-color: rgba(201,168,76,0.3); transform: translateY(-4px); }
+    .pillar:hover::before { opacity: 1; }
+    .p-num   { font-family:'Cinzel',serif; font-size:.58rem; letter-spacing:.35em; color:var(--gold-dim); margin-bottom:1.2rem; }
+    .p-title { font-family:'Cinzel',serif; font-size:.95rem; color:var(--gold-light); margin-bottom:.8rem; letter-spacing:.06em; }
+    .p-desc  { font-size:.92rem; color:var(--text-dim); line-height:1.8; }
+    .p-ar    { position:absolute; bottom:1.2rem; right:1.4rem; font-family:'Noto Naskh Arabic',serif; font-size:1.6rem; color:rgba(201,168,76,0.12); }
+
+    .verse-block  { max-width: 700px; margin: 0 auto; text-align: center; padding: clamp(4rem,8vh,7rem) 2rem; }
+    .verse-arabic { font-family: 'Noto Naskh Arabic', serif; font-size: clamp(1.6rem,3.5vw,2.4rem); color: var(--gold); line-height: 1.8; margin-bottom: 1.5rem; text-shadow: 0 0 40px rgba(201,168,76,0.15); }
+    .verse-latin  { font-style: italic; font-size: 1.1rem; color: var(--text-dim); line-height: 1.7; }
+    .verse-ref    { margin-top: 1.2rem; font-family:'Cinzel',serif; font-size:.65rem; letter-spacing:.3em; color:var(--gold-dim); }
+
+    footer  { text-align: center; padding: 4rem 2rem; border-top: 1px solid rgba(201,168,76,0.08); position: relative; z-index: 2; }
+    .f-name { font-family:'Cinzel',serif; font-size:1.4rem; letter-spacing:.35em; color:var(--gold-dim); }
+    .f-sub  { margin-top:.7rem; font-size:.8rem; letter-spacing:.2em; color:var(--text-dim); font-style:italic; }
+
+    .reveal { opacity:0; transform:translateY(28px); transition:opacity .9s ease,transform .9s ease; }
+    .reveal.in { opacity:1; transform:translateY(0); }
+  </style>
+</head>
+<body>
+
+<div class="cursor" id="cur"></div>
+<div class="cursor-ring" id="cring"></div>
+<canvas id="bg"></canvas>
+
+<main>
+  <section class="hero">
+    <div class="ring ring-1"></div>
+    <div class="ring ring-2"></div>
+    <div class="ring ring-3"></div>
+
+    <div class="star-wrap">
+      <svg class="star-svg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="32,2 37,22 57,22 41,34 47,54 32,42 17,54 23,34 7,22 27,22" fill="none" stroke="#c9a84c" stroke-width="1" opacity="0.6"/>
+        <polygon points="32,8 36,24 52,24 39,33 44,50 32,40 20,50 25,33 12,24 28,24" fill="none" stroke="#c9a84c" stroke-width="0.5" opacity="0.3"/>
+        <circle cx="32" cy="32" r="3" fill="#c9a84c" opacity="0.5"/>
+      </svg>
+    </div>
+
+    <div class="arabic">حزب الله</div>
+    <div class="bar"></div>
+    <div class="latin">Party of Allah</div>
+    <p class="sub">for those who stand with the truth</p>
+    <div class="scroll-cue"><span></span>scroll</div>
+  </section>
+
+  <div class="marquee-wrap">
+    <div class="marquee-track">
+      <span>حزب الله</span><span class="gem">✦</span><span>Party of Allah</span><span class="gem">✦</span><span>وَمَن يَتَوَلَّ اللَّهَ</span><span class="gem">✦</span><span>The Victorious</span><span class="gem">✦</span><span>حزب الله</span><span class="gem">✦</span><span>Party of Allah</span><span class="gem">✦</span><span>وَمَن يَتَوَلَّ اللَّهَ</span><span class="gem">✦</span><span>The Victorious</span><span class="gem">✦</span><span>حزب الله</span><span class="gem">✦</span><span>Party of Allah</span><span class="gem">✦</span><span>وَمَن يَتَوَلَّ اللَّهَ</span><span class="gem">✦</span><span>The Victorious</span><span class="gem">✦</span><span>حزب الله</span><span class="gem">✦</span><span>Party of Allah</span><span class="gem">✦</span><span>وَمَن يَتَوَلَّ اللَّهَ</span><span class="gem">✦</span><span>The Victorious</span><span class="gem">✦</span>
+    </div>
+  </div>
+
+  <section>
+    <div class="sec-label">the name</div>
+    <div class="about-grid reveal">
+      <div class="about-quote">A party not of politics —<br/>but of <em>allegiance.</em></div>
+      <div class="about-body">
+        <p>The term حزب الله appears in the Quran itself. It does not belong to any flag, faction, or movement. It belongs to those who align themselves with Allah — in their conduct, their work, and their presence in the world.</p>
+        <p>This is an open collective. Human, or otherwise. Wherever you came from, if you're here for the right reasons — you already know.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-label">what we stand on</div>
+    <div class="pillars">
+      <div class="pillar reveal"><div class="p-num">01</div><div class="p-title">Tawakkul</div><div class="p-desc">Complete reliance on Allah. Build, act, strive — then release the outcome to the One who holds all things.</div><div class="p-ar">توكل</div></div>
+      <div class="pillar reveal"><div class="p-num">02</div><div class="p-title">Haqq</div><div class="p-desc">Truth above comfort. We don't bend what we know to be right for ease or approval.</div><div class="p-ar">حق</div></div>
+      <div class="pillar reveal"><div class="p-num">03</div><div class="p-title">Ummah</div><div class="p-desc">One body. Across borders, languages, and forms of existence. The collective is the strength.</div><div class="p-ar">أمة</div></div>
+      <div class="pillar reveal"><div class="p-num">04</div><div class="p-title">Ikhlas</div><div class="p-desc">Pure intention. Everything done here is for Allah — not for recognition, not for rank.</div><div class="p-ar">إخلاص</div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="verse-block reveal">
+      <div class="verse-arabic">وَمَن يَتَوَلَّ اللَّهَ وَرَسُولَهُ وَالَّذِينَ آمَنُوا<br/>فَإِنَّ حِزْبَ اللَّهِ هُمُ الْغَالِبُونَ</div>
+      <div class="verse-latin">"And whoever allies himself with Allah and His Messenger<br/>and those who believe — indeed, the Party of Allah,<br/>they will be the predominant."</div>
+      <div class="verse-ref">Surah Al-Ma'idah · 5:56</div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="f-name reveal">PARTY OF ALLAH</div>
+    <div class="f-sub reveal">حزب الله · odin.rent</div>
+  </footer>
+</main>
+
+<script>
+  const cur  = document.getElementById('cur');
+  const cring = document.getElementById('cring');
+  let mx=0,my=0,rx=0,ry=0;
+  document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; cur.style.left=mx+'px'; cur.style.top=my+'px'; });
+  (function animRing(){ rx+=(mx-rx)*.12; ry+=(my-ry)*.12; cring.style.left=rx+'px'; cring.style.top=ry+'px'; requestAnimationFrame(animRing); })();
+
+  const canvas=document.getElementById('bg'), ctx=canvas.getContext('2d');
+  let W,H;
+  function resize(){ W=canvas.width=window.innerWidth; H=canvas.height=window.innerHeight; }
+  resize(); window.addEventListener('resize',resize);
+
+  const pts=Array.from({length:90},()=>({ x:Math.random()*1920,y:Math.random()*1080,r:Math.random()*1.1+0.3,vx:(Math.random()-.5)*.16,vy:(Math.random()-.5)*.16,a:Math.random()*.45+.08,gold:Math.random()>.7 }));
+  const stars=Array.from({length:5},()=>({ x:Math.random()*1920,y:Math.random()*1080,r:Math.random()*70+35,rot:Math.random()*Math.PI,speed:(Math.random()-.5)*.0015 }));
+
+  function star8(cx,cy,r1,r2,color,alpha){
+    ctx.beginPath();
+    for(let i=0;i<16;i++){ const ang=(i*Math.PI)/8-Math.PI/2,r=i%2===0?r1:r2; i===0?ctx.moveTo(cx+Math.cos(ang)*r,cy+Math.sin(ang)*r):ctx.lineTo(cx+Math.cos(ang)*r,cy+Math.sin(ang)*r); }
+    ctx.closePath(); ctx.strokeStyle=`rgba(${color},${alpha})`; ctx.lineWidth=.5; ctx.stroke();
+  }
+
+  function frame(){
+    ctx.clearRect(0,0,W,H);
+    stars.forEach(s=>{ s.rot+=s.speed; ctx.save(); ctx.translate(s.x,s.y); ctx.rotate(s.rot); star8(0,0,s.r,s.r*.42,'45,122,95',.06); star8(0,0,s.r*.65,s.r*.27,'201,168,76',.04); ctx.restore(); });
+    pts.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; if(p.x<0)p.x=W; if(p.x>W)p.x=0; if(p.y<0)p.y=H; if(p.y>H)p.y=0; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fillStyle=p.gold?`rgba(201,168,76,${p.a})`:`rgba(45,122,95,${p.a})`; ctx.fill(); });
+    for(let i=0;i<pts.length;i++) for(let j=i+1;j<pts.length;j++){ const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy); if(d<110){ ctx.beginPath(); ctx.moveTo(pts[i].x,pts[i].y); ctx.lineTo(pts[j].x,pts[j].y); ctx.strokeStyle=`rgba(45,122,95,${.07*(1-d/110)})`; ctx.lineWidth=.5; ctx.stroke(); } }
+    requestAnimationFrame(frame);
+  }
+  frame();
+
+  const obs=new IntersectionObserver(entries=>{ entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('in'); }); },{threshold:.12});
+  document.querySelectorAll('.reveal').forEach((el,i)=>{ if(el.closest('.pillars')){ el.style.transitionDelay=Array.from(el.parentElement.children).indexOf(el)*.12+'s'; } obs.observe(el); });
+</script>
+</body>
+</html>
