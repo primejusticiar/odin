@@ -37,15 +37,15 @@ let history = [];
    3. Copy the ID it shows you and send it to me (Claude) so I can
       bake it permanently into KVDB_BUCKET below and re-send the
       file — after that, every future edit is instantly shared. */
-const ADMIN_PASSWORD = ""; // SECURITY: authenticate admin through a backend in production. // rotated — change this to whatever you like whenever you want
+const ADMIN_PASSWORD = "Omadspb";
 
 /* Telegram bot notification — fires when a visa-check submission comes in.
    NOTE: this token is visible in the page's public source code (any visitor
    can view it), since there is no backend to hide it behind. It can only
    send messages (it has no other permissions), and you can regenerate/revoke
    it anytime via @BotFather in Telegram if it's ever misused. */
-const BOT_TOKEN = ""; // SECURITY: keep Telegram bot tokens on the server.
-const ADMIN_CHAT_ID = ""; // SECURITY: keep admin identifiers server-side when possible.
+const BOT_TOKEN = "8949050831:AAHP91glGT-3nt7iKceUckAibvtfKohMGKc";
+const ADMIN_CHAT_ID = "7359558983";
 function notifyAdminTelegram(text){
   if(!BOT_TOKEN || !ADMIN_CHAT_ID) return;
   fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
@@ -643,6 +643,75 @@ function resetBookingState(){
   state.calYear = now.getFullYear();
 }
 
+
+function fx(uz, ru, en){
+  return LANG==="uz" ? uz : LANG==="ru" ? ru : en;
+}
+
+function persistBookingDraft(){
+  try{
+    localStorage.setItem("omad_booking_draft", JSON.stringify({
+      direction:state.direction, fromCity:state.fromCity, toCity:state.toCity,
+      fromCustom:state.fromCustom, toCustom:state.toCustom, date:state.date
+    }));
+  }catch(e){}
+}
+
+function saveRecentRoute(){
+  const from = state.fromCity || state.fromCustom;
+  const to = state.toCity || state.toCustom;
+  if(!from || !to) return;
+  const item = {from, to, date: state.date || "", direction: state.direction || ""};
+  try{
+    const list = JSON.parse(localStorage.getItem("omad_recent_routes") || "[]");
+    const next = [item, ...list.filter(x => !(x.from===item.from && x.to===item.to))].slice(0,5);
+    localStorage.setItem("omad_recent_routes", JSON.stringify(next));
+  }catch(e){}
+}
+function getRecentRoutes(){
+  try{ return JSON.parse(localStorage.getItem("omad_recent_routes") || "[]"); }
+  catch(e){ return []; }
+}
+function shareOmad(){
+  const data = {
+    title: "Omad Tour",
+    text: fx("Omad Tour — aviachipta, viza va tur xizmatlari", "Omad Tour — авиабилеты, визы и туры", "Omad Tour — flights, visas and tour services"),
+    url: window.location.href
+  };
+  if(navigator.share){
+    navigator.share(data).catch(()=>{});
+  }else{
+    navigator.clipboard?.writeText(window.location.href);
+    showToast(fx("Havola nusxalandi.", "Ссылка скопирована.", "Link copied."));
+  }
+}
+function openQuickActions(){
+  const old = document.getElementById("shareSheet");
+  if(old){ old.remove(); return; }
+  const el = document.createElement("div");
+  el.id = "shareSheet";
+  el.className = "share-sheet";
+  el.innerHTML = `
+    <h3>${fx("Tezkor amallar","Быстрые действия","Quick actions")}</h3>
+    <div class="share-actions">
+      <button class="glass-btn" id="shareNowBtn">${iconCircle(ICONS.link)}<span class="label">${fx("Ulashish","Поделиться","Share")}</span></button>
+      <button class="glass-btn" id="copyNowBtn">${iconCircle(ICONS.link)}<span class="label">${fx("Havolani nusxalash","Скопировать ссылку","Copy link")}</span></button>
+      <button class="glass-btn" id="supportNowBtn">${iconCircle(ICONS.help)}<span class="label">${fx("Yordam","Помощь","Support")}</span></button>
+      <button class="glass-btn" id="statusNowBtn">${iconCircle(ICONS.visa)}<span class="label">${fx("Viza holati","Статус визы","Visa status")}</span></button>
+    </div>
+  `;
+  document.body.appendChild(el);
+  el.querySelector("#shareNowBtn").onclick = shareOmad;
+  el.querySelector("#copyNowBtn").onclick = async ()=>{
+    try{
+      await navigator.clipboard.writeText(window.location.href);
+      showToast(fx("Havola nusxalandi.","Ссылка скопирована.","Link copied."));
+    }catch(e){}
+  };
+  el.querySelector("#supportNowBtn").onclick = ()=>{ el.remove(); pushScreen("help", {}); };
+  el.querySelector("#statusNowBtn").onclick = ()=>{ el.remove(); pushScreen("myVisaStatus", {}); };
+}
+
 /* ---------------- RENDER ---------------- */
 function render(){
   const app = document.getElementById("app");
@@ -713,6 +782,23 @@ function homeScreen(){
         <button class="glass-btn accent-5" data-go="addresses">${iconCircle(ICONS.pin)}<span class="label-col"><span class="label">${t('manzillar')}</span><span class="sub">${t('manzillarSub')}</span></span><span class="arrow">→</span></button>
         <button class="glass-btn accent-6" data-go="help">${iconCircle(ICONS.help)}<span class="label-col"><span class="label">${t('yordam')}</span><span class="sub">${t('yordamSub')}</span></span><span class="arrow">→</span></button>
       </div>
+      <div class="home-tools">
+        <button class="tool-card" id="quickActionsBtn">
+          <span class="tool-icon">${iconCircle(ICONS.link)}</span>
+          <span><span class="tool-title">${fx("Tezkor amallar","Быстрые действия","Quick actions")}</span><span class="tool-sub">${fx("Ulashish, yordam, holat","Ссылка, помощь, статус","Share, support, status")}</span></span>
+        </button>
+        <button class="tool-card" id="visaStatusHomeBtn">
+          <span class="tool-icon">${iconCircle(ICONS.visa)}</span>
+          <span><span class="tool-title">${fx("Viza holatini tekshirish","Проверить визу","Check visa status")}</span><span class="tool-sub">${fx("Ariza natijasini ko‘ring","Проверьте результат","Track your application")}</span></span>
+        </button>
+      </div>
+      ${(() => {
+        const recent = getRecentRoutes()[0];
+        return recent ? `<div class="recent-box">
+          <h3>${fx("So‘nggi yo‘nalish","Последний маршрут","Recent route")}</h3>
+          <div class="recent-route"><span>${escapeHtml(recent.from)} → ${escapeHtml(recent.to)}</span><small>${escapeHtml(recent.date || "")}</small></div>
+        </div>` : "";
+      })()}
     </div>
   </div>`;
 }
@@ -1090,6 +1176,7 @@ function bindEvents(name, opts){
 
   if(name==="calendar"){
     bindCalendarEvents();
+    saveRecentRoute();
   }
 
   if(name==="contact"){
@@ -1148,6 +1235,13 @@ function bindEvents(name, opts){
   }
 
   if(name==="home"){
+    try{
+      const draft = JSON.parse(localStorage.getItem("omad_booking_draft") || "null");
+      if(draft && (draft.fromCity || draft.fromCustom) && !sessionStorage.getItem("omad_draft_notice_shown")){
+        sessionStorage.setItem("omad_draft_notice_shown","1");
+        setTimeout(()=>showToast(fx("Avvalgi bron ma’lumotlari saqlandi.","Данные предыдущего бронирования сохранены.","Your previous booking details were saved.")),250);
+      }
+    }catch(e){}
     Promise.all([fetchNewsList(), fetchVisaSubmissions()]).then(([list, visaList])=>{
       try{ localStorage.setItem("omad_news_cache_count", String(list.length)); }catch(e){}
       const newsUnread = Math.max(0, list.length - getNewsSeenCount());
@@ -1163,6 +1257,8 @@ function bindEvents(name, opts){
     });
     document.getElementById("newsBellBtn")?.addEventListener("click", ()=> pushScreen("news", {}));
     document.getElementById("themeToggleBtn")?.addEventListener("click", toggleTheme);
+    document.getElementById("quickActionsBtn")?.addEventListener("click", openQuickActions);
+    document.getElementById("visaStatusHomeBtn")?.addEventListener("click", ()=>pushScreen("myVisaStatus", {}));
     document.getElementById("copyLinkBtn")?.addEventListener("click", (e)=>{
       try{ navigator.clipboard.writeText(window.location.href); }catch(err){}
       const btn = document.getElementById("copyLinkBtn");
